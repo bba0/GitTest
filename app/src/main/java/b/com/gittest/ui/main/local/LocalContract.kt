@@ -7,7 +7,7 @@ interface LocalContract {
 
     }
 
-    interface LocalView : BaseContract.BaseView {
+    interface LocalView : BaseContract.BaseView<Presenter> {
 
     }
 }

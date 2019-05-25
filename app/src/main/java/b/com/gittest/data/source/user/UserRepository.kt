@@ -5,14 +5,23 @@ import b.com.gittest.data.model.User
 import io.reactivex.Single
 
 class UserRepository private constructor(private var remoteUserDataSource: UserDataSource) : UserDataSource {
-    val cacheMap = HashMap<Int, User>()
-
+    private val userCacheMap = HashMap<Int, User>()
     override fun likeUser(id: Int) {
-
+        userCacheMap[id]?.run {
+            isLike = true
+        }
     }
 
     override fun getUsers(query: String, page: Int): Single<GitUserApiModel> {
-        return remoteUserDataSource.getUsers(query, page)
+        return remoteUserDataSource.getUsers(query, page).map { gitUserApiModel ->
+            gitUserApiModel.items?.forEach { user ->
+                userCacheMap[user.userId]?.run {
+                    user.isLike = isLike
+                }
+                userCacheMap[user.userId] = user
+            }
+            gitUserApiModel
+        }
     }
 
     override fun getAllLikeUsers(): Single<List<User>> {
@@ -24,7 +33,9 @@ class UserRepository private constructor(private var remoteUserDataSource: UserD
     }
 
     override fun unLikeUser(id: Int) {
-
+        userCacheMap[id]?.run {
+            isLike = false
+        }
     }
 
     companion object {

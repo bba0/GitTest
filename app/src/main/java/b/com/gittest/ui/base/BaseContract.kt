@@ -4,8 +4,9 @@ interface BaseContract {
     interface BasePresenter {
         fun resume()
         fun pause()
+        fun setLike(id: Int)
     }
-    interface BaseView {
-
+    interface BaseView<T> {
+        var presenter: T
     }
 }
