@@ -4,12 +4,20 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import b.com.gittest.R
+import b.com.gittest.data.source.user.RemoteUserDataSource
+import b.com.gittest.data.source.user.UserRepository
 import b.com.gittest.ext.replaceFragment
+import b.com.gittest.ext.toast
+import b.com.gittest.ui.main.api.ApiContract
 import b.com.gittest.ui.main.api.ApiFragment
+import b.com.gittest.ui.main.api.ApiPresenter
+import b.com.gittest.ui.main.local.LocalContract
 import b.com.gittest.ui.main.local.LocalFragment
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
+    lateinit var apiPresenter: ApiContract.Presenter
+    lateinit var localPresenter: LocalContract.Presenter
     private val onClickChangeType = View.OnClickListener {
         when(it) {
             api_button -> {
@@ -29,6 +37,21 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         api_button.setOnClickListener(onClickChangeType)
         local_button.setOnClickListener(onClickChangeType)
+
+        main_search_button.setOnClickListener {
+            main_auto_complete_text_view.text.toString().run {
+                if (isNullOrEmpty()) {
+                    toast(R.string.search_text_input_please)
+                } else {
+                    if (api_button.isEnabled) {
+                    } else {
+                        apiPresenter.search(this, false)
+                    }
+                }
+            }
+        }
+        api_button.isEnabled = false
+        setApiFragment()
     }
 
     private fun setApiFragment() {
@@ -37,6 +60,7 @@ class MainActivity : AppCompatActivity() {
             addStack = true
             ApiFragment()
         }
+        apiPresenter = ApiPresenter(fragment as ApiFragment, UserRepository.getInstance(RemoteUserDataSource))
         replaceFragment(fragment_frame_layout.id, fragment, ApiFragment.API_FRAGMENT_TAG, addStack)
     }
     private fun setLocalFragment() {
