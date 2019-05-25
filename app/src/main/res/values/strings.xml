@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">GitTest</string>
+    <string name="search">검색</string>
+    <string name="api">API</string>
+    <string name="local">Local</string>
+    <string name="search_hint">GitHub user search</string>
+</resources>
