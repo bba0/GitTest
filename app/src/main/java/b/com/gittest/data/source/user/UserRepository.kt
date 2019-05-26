@@ -6,7 +6,7 @@ import io.reactivex.Observable
 import io.reactivex.Single
 
 class UserRepository private constructor(private var remoteUserDataSource: UserDataSource) : UserDataSource {
-    val userCacheMap = HashMap<Int, User>()
+    private val userCacheMap = HashMap<Int, User>()
     override fun likeUser(id: Int) {
         userCacheMap[id]?.run {
             isLike = true
