@@ -11,5 +11,6 @@ interface ApiContract {
 
     interface Presenter: BaseContract.BasePresenter {
         fun search(query: String, isMore: Boolean)
+        fun moreData()
     }
 }

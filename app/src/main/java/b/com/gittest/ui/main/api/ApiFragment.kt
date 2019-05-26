@@ -3,6 +3,7 @@ package b.com.gittest.ui.main.api
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,6 +20,7 @@ class ApiFragment : Fragment(), ApiContract.View {
         }
     }
     private val userLinearLayoutManager = LinearLayoutManager(activity)
+    val reloadSize = 10
 
     companion object {
         const val API_FRAGMENT_TAG = "api_fragment_tag"
@@ -32,6 +34,14 @@ class ApiFragment : Fragment(), ApiContract.View {
                 api_recycler_view.run {
                     adapter = userAdapter
                     layoutManager = userLinearLayoutManager
+                    addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                            super.onScrolled(recyclerView, dx, dy)
+                            if (userLinearLayoutManager.findLastCompletelyVisibleItemPosition() == userAdapter.itemCount - reloadSize) {
+                                presenter.moreData()
+                            }
+                        }
+                    })
                 }
             }
         }

@@ -14,6 +14,7 @@ class ApiPresenter(private val view: ApiContract.View, private var userRepositor
     private var page = 1
     private var query: String = ""
     private var incompleteResult = true
+    private var isLoading = false
     private val searchResult = ArrayList<User>()
     private var mCompositeDisposable = CompositeDisposable()
 
@@ -36,10 +37,18 @@ class ApiPresenter(private val view: ApiContract.View, private var userRepositor
             }
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
+                isLoading = false
                 view.addUserData(it)
         }, {
             Log.e("lol", "error", it)
         }))
+    }
+
+    override fun moreData() {
+        if (!isLoading && !incompleteResult) {
+            search(query, true)
+            isLoading = true
+        }
     }
 
     override fun setLike(id: Int) {
