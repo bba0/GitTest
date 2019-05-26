@@ -1,11 +1,10 @@
 package b.com.gittest.ui.main.api
 
-import android.util.Log
 import b.com.gittest.data.model.User
 import b.com.gittest.data.source.user.UserDataSource
-import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import org.jetbrains.annotations.TestOnly
 
 class ApiPresenter(private val view: ApiContract.View, private var userRepository: UserDataSource) : ApiContract.Presenter {
     init {
@@ -40,7 +39,7 @@ class ApiPresenter(private val view: ApiContract.View, private var userRepositor
                 isLoading = false
                 view.addUserData(it)
         }, {
-            Log.e("lol", "error", it)
+
         }))
     }
 
@@ -72,6 +71,11 @@ class ApiPresenter(private val view: ApiContract.View, private var userRepositor
 
     override fun pause() {
         mCompositeDisposable.clear()
+    }
+
+    @TestOnly
+    fun getSearchResultFirstId(): Int {
+        return searchResult[0]?.userId
     }
 
 }
