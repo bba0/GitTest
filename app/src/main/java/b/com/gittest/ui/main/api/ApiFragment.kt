@@ -12,26 +12,13 @@ import b.com.gittest.ui.main.UserAdapter
 import kotlinx.android.synthetic.main.fragment_api.view.*
 
 class ApiFragment : Fragment(), ApiContract.View {
-    override fun updateUserData(user: User) {
-        userAdapter.updateData(user)
-    }
-
     override lateinit var presenter: ApiContract.Presenter
     private val userAdapter: UserAdapter by lazy {
         UserAdapter {
             presenter.setLike(it)
         }
     }
-    private val userLinearLayoutManager: LinearLayoutManager by lazy {
-        LinearLayoutManager(context)
-    }
-    override fun addUserData(userList: List<User>) {
-        userAdapter.addUserData(userList)
-    }
-
-    override fun removeAllData() {
-        userAdapter.clearData()
-    }
+    private val userLinearLayoutManager = LinearLayoutManager(activity)
 
     companion object {
         const val API_FRAGMENT_TAG = "api_fragment_tag"
@@ -51,7 +38,30 @@ class ApiFragment : Fragment(), ApiContract.View {
         return rootView
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
+    override fun onResume() {
+        super.onResume()
+        presenter.resume()
     }
+
+    override fun onPause() {
+        super.onPause()
+        presenter.pause()
+    }
+
+    override fun addUserData(userList: List<User>) {
+        userAdapter.addUserData(userList)
+    }
+
+    override fun removeAllData() {
+        userAdapter.clearData()
+    }
+
+    override fun update() {
+        userAdapter.update()
+    }
+
+    override fun updateUserData(user: User) {
+        userAdapter.updateData(user)
+    }
+
 }

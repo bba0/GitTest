@@ -7,7 +7,6 @@ import io.reactivex.Single
 interface UserDataSource {
     fun getUsers(query: String, page: Int): Single<GitUserApiModel>
     fun getAllLikeUsers(): Single<List<User>>
-    fun findLikeUsers(query: String): Single<List<User>>
     fun unLikeUser(id: Int)
     fun likeUser(id: Int)
 }

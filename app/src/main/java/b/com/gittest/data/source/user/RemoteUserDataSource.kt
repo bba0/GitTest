@@ -15,11 +15,6 @@ object RemoteUserDataSource : UserDataSource {
         return Single.just(ArrayList())
     }
 
-    override fun findLikeUsers(query: String): Single<List<User>> {
-        //서버에서 제공하는 경우 연결해서 사용
-        return Single.just(ArrayList())
-    }
-
     override fun unLikeUser(id: Int) {
         //서버에서 제공하는 경우 연결해서 사용
     }

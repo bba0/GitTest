@@ -68,6 +68,21 @@ class UserAdapter(private var onLikeClick: (Int) -> Unit) : RecyclerView.Adapter
         }
     }
 
+    fun update() {
+        notifyDataSetChanged()
+    }
+
+    fun removeUser(id: Int) {
+        var user = userList.filterIndexed { index, user ->
+            if (user.userId == id) {
+                notifyItemRemoved(index)
+                return@filterIndexed true
+            }
+            return@filterIndexed  false
+        }.first()
+        userList.remove(user)
+    }
+
     class UserHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val avatarSimpleDraweeView: SimpleDraweeView = itemView.findViewById(R.id.avatar_simple_drawee_view)
         val nameTextView: TextView = itemView.findViewById(R.id.name_text_view)

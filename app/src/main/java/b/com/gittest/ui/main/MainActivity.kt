@@ -13,6 +13,7 @@ import b.com.gittest.ui.main.api.ApiFragment
 import b.com.gittest.ui.main.api.ApiPresenter
 import b.com.gittest.ui.main.local.LocalContract
 import b.com.gittest.ui.main.local.LocalFragment
+import b.com.gittest.ui.main.local.LocalPresenter
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -44,6 +45,7 @@ class MainActivity : AppCompatActivity() {
                     toast(R.string.search_text_input_please)
                 } else {
                     if (api_button.isEnabled) {
+                        localPresenter.findLikeUser(this)
                     } else {
                         apiPresenter.search(this, false)
                     }
@@ -58,16 +60,19 @@ class MainActivity : AppCompatActivity() {
         var addStack = false
         val fragment = supportFragmentManager.findFragmentByTag(ApiFragment.API_FRAGMENT_TAG) ?: addStack.run {
             addStack = true
-            ApiFragment()
+            var fragment = ApiFragment()
+            apiPresenter = ApiPresenter(fragment as ApiFragment, UserRepository.getInstance(RemoteUserDataSource))
+            fragment
         }
-        apiPresenter = ApiPresenter(fragment as ApiFragment, UserRepository.getInstance(RemoteUserDataSource))
         replaceFragment(fragment_frame_layout.id, fragment, ApiFragment.API_FRAGMENT_TAG, addStack)
     }
     private fun setLocalFragment() {
         var addStack = false
         val fragment = supportFragmentManager.findFragmentByTag(LocalFragment.LOCAL_FRAGMENT_TAG) ?: addStack.run {
             addStack = true
-            LocalFragment()
+            var fragment = LocalFragment()
+            localPresenter = LocalPresenter(fragment as LocalFragment, UserRepository.getInstance(RemoteUserDataSource))
+            fragment
         }
         replaceFragment(fragment_frame_layout.id, fragment, LocalFragment.LOCAL_FRAGMENT_TAG, addStack)
     }

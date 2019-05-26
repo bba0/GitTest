@@ -2,10 +2,11 @@ package b.com.gittest.data.source.user
 
 import b.com.gittest.data.model.GitUserApiModel
 import b.com.gittest.data.model.User
+import io.reactivex.Observable
 import io.reactivex.Single
 
 class UserRepository private constructor(private var remoteUserDataSource: UserDataSource) : UserDataSource {
-    private val userCacheMap = HashMap<Int, User>()
+    val userCacheMap = HashMap<Int, User>()
     override fun likeUser(id: Int) {
         userCacheMap[id]?.run {
             isLike = true
@@ -25,11 +26,18 @@ class UserRepository private constructor(private var remoteUserDataSource: UserD
     }
 
     override fun getAllLikeUsers(): Single<List<User>> {
-        return Single.just(ArrayList<User>())
-    }
-
-    override fun findLikeUsers(query: String): Single<List<User>> {
-        return Single.just(ArrayList<User>())
+        return Single.just(userCacheMap.values)
+            .toObservable()
+            .flatMap {
+                Observable.fromIterable(it)
+            }
+            .filter {
+                it.isLike
+            }
+            .toList()
+            .map {
+                ArrayList(it)
+            }
     }
 
     override fun unLikeUser(id: Int) {
