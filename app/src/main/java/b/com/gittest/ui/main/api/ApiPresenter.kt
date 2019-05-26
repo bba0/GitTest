@@ -5,6 +5,7 @@ import b.com.gittest.data.model.User
 import b.com.gittest.data.source.user.UserDataSource
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
 
 class ApiPresenter(private val view: ApiContract.View, private var userRepository: UserDataSource) : ApiContract.Presenter {
     init {
@@ -14,6 +15,7 @@ class ApiPresenter(private val view: ApiContract.View, private var userRepositor
     private var query: String = ""
     private var incompleteResult = true
     private val searchResult = ArrayList<User>()
+    private var mCompositeDisposable = CompositeDisposable()
 
     override fun search(query: String, isMore: Boolean) {
         if (isMore) {
@@ -23,7 +25,7 @@ class ApiPresenter(private val view: ApiContract.View, private var userRepositor
             view.removeAllData()
         }
         this.query = query
-        userRepository.getUsers(query, page)
+        mCompositeDisposable.add(userRepository.getUsers(query, page)
             .map {
                 incompleteResult = it.incompleteResult ?: true
                 it.items ?: ArrayList()
@@ -37,7 +39,7 @@ class ApiPresenter(private val view: ApiContract.View, private var userRepositor
                 view.addUserData(it)
         }, {
             Log.e("lol", "error", it)
-        })
+        }))
     }
 
     override fun setLike(id: Int) {
@@ -60,7 +62,7 @@ class ApiPresenter(private val view: ApiContract.View, private var userRepositor
     }
 
     override fun pause() {
-        Log.e("lol", "")
+        mCompositeDisposable.clear()
     }
 
 }

@@ -1,7 +1,5 @@
 package b.com.gittest.ui.base
 
-import b.com.gittest.data.model.User
-
 interface BaseContract {
     interface BasePresenter {
         fun resume()

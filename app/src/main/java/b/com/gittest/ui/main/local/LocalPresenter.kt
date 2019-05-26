@@ -3,6 +3,7 @@ package b.com.gittest.ui.main.local
 import b.com.gittest.data.source.user.UserDataSource
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 
 class LocalPresenter(private val view: LocalContract.View, private var userRepository: UserDataSource) : LocalContract.Presenter {
@@ -10,12 +11,13 @@ class LocalPresenter(private val view: LocalContract.View, private var userRepos
         view.presenter = this
     }
     var query = ""
+    private var mCompositeDisposable = CompositeDisposable()
     override fun resume() {
         findLikeUser(query)
     }
 
     override fun pause() {
-
+        mCompositeDisposable.clear()
     }
 
     override fun setLike(id: Int) {
@@ -26,7 +28,7 @@ class LocalPresenter(private val view: LocalContract.View, private var userRepos
     override fun findLikeUser(query: String) {
         this.query = query
         view.removeAllData()
-        userRepository.getAllLikeUsers()
+        mCompositeDisposable.add(userRepository.getAllLikeUsers()
             .toObservable()
             .flatMap {
                 Observable.fromIterable(it)
@@ -45,7 +47,7 @@ class LocalPresenter(private val view: LocalContract.View, private var userRepos
                 view.addLikeUserData(it)
         }, {
 
-        })
+        }))
     }
 
 }
