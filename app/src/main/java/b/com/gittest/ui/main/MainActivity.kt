@@ -1,6 +1,7 @@
 package b.com.gittest.ui.main
 
 import android.os.Bundle
+import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import b.com.gittest.R
@@ -19,20 +20,26 @@ import kotlinx.android.synthetic.main.activity_main.*
 class MainActivity : AppCompatActivity() {
     lateinit var apiPresenter: ApiContract.Presenter
     lateinit var localPresenter: LocalContract.Presenter
+    private var fragmentType = FragmentType.API
+
     private val onClickChangeType = View.OnClickListener {
-        when(it) {
-            api_button -> {
-                api_button.isEnabled = false
-                local_button.isEnabled = true
-                setApiFragment()
-            }
+        fragmentType = when (it) {
             local_button -> {
-                api_button.isEnabled = true
-                local_button.isEnabled = false
-                setLocalFragment()
+                FragmentType.LOCAL
+            }
+            else -> {
+                FragmentType.API
             }
         }
+        setButton()
+        setFragment()
     }
+
+    private fun setButton() {
+        api_button.isEnabled = fragmentType != FragmentType.API
+        local_button.isEnabled = fragmentType != FragmentType.LOCAL
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -41,39 +48,46 @@ class MainActivity : AppCompatActivity() {
 
         main_search_button.setOnClickListener {
             main_auto_complete_text_view.text.toString().run {
-                if (isNullOrEmpty()) {
+                if (isNullOrEmpty() && fragmentType == FragmentType.API) {
                     toast(R.string.search_text_input_please)
                 } else {
-                    if (api_button.isEnabled) {
-                        localPresenter.findLikeUser(this)
-                    } else {
+                    if (fragmentType == FragmentType.API) {
                         apiPresenter.search(this, false)
+                    } else {
+                        localPresenter.findLikeUser(this)
                     }
                 }
             }
         }
-        api_button.isEnabled = false
-        setApiFragment()
+        setButton()
+        setFragment()
     }
 
-    private fun setApiFragment() {
+    private fun setFragment() {
         var addStack = false
-        val fragment = supportFragmentManager.findFragmentByTag(ApiFragment.API_FRAGMENT_TAG) ?: addStack.run {
+        val fragment: Fragment = supportFragmentManager.findFragmentByTag(fragmentType.tag) ?: run {
             addStack = true
-            var fragment = ApiFragment()
-            apiPresenter = ApiPresenter(fragment as ApiFragment, UserRepository.getInstance(RemoteUserDataSource))
-            fragment
+            when (fragmentType) {
+                FragmentType.API -> {
+                    ApiFragment().apply {
+                        apiPresenter = ApiPresenter(this, UserRepository.getInstance(RemoteUserDataSource))
+                    }
+                }
+                FragmentType.LOCAL -> {
+                    LocalFragment().apply {
+                        localPresenter = LocalPresenter(this, UserRepository.getInstance(RemoteUserDataSource))
+                    }
+                }
+            } as Fragment
         }
-        replaceFragment(fragment_frame_layout.id, fragment, ApiFragment.API_FRAGMENT_TAG, addStack)
+        replaceFragment(fragment_frame_layout.id, fragment, fragmentType.tag, addStack)
     }
-    private fun setLocalFragment() {
-        var addStack = false
-        val fragment = supportFragmentManager.findFragmentByTag(LocalFragment.LOCAL_FRAGMENT_TAG) ?: addStack.run {
-            addStack = true
-            var fragment = LocalFragment()
-            localPresenter = LocalPresenter(fragment as LocalFragment, UserRepository.getInstance(RemoteUserDataSource))
-            fragment
-        }
-        replaceFragment(fragment_frame_layout.id, fragment, LocalFragment.LOCAL_FRAGMENT_TAG, addStack)
+
+    override fun onBackPressed() {
+        finish()
+    }
+
+    enum class FragmentType(var tag: String) {
+        API(ApiFragment.API_FRAGMENT_TAG), LOCAL(LocalFragment.LOCAL_FRAGMENT_TAG)
     }
 }
