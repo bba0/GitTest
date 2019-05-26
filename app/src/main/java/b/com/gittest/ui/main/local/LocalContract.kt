@@ -9,7 +9,6 @@ interface LocalContract {
     }
 
     interface View : BaseContract.BaseView<Presenter> {
-        fun removeAllData()
         fun addLikeUserData(userList: List<User>)
         fun updateUserData(user: User)
         fun removeData(id: Int)

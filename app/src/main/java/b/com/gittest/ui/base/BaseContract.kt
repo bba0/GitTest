@@ -1,5 +1,7 @@
 package b.com.gittest.ui.base
 
+import b.com.gittest.data.model.User
+
 interface BaseContract {
     interface BasePresenter {
         fun resume()
@@ -9,5 +11,6 @@ interface BaseContract {
     interface BaseView<T> {
         var presenter: T
         fun update()
+        fun removeAllData()
     }
 }

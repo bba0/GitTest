@@ -5,7 +5,6 @@ import b.com.gittest.ui.base.BaseContract
 
 interface ApiContract {
     interface View: BaseContract.BaseView<Presenter> {
-        fun removeAllData()
         fun addUserData(userList: List<User>)
         fun updateUserData(user: User)
     }
