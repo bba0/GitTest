@@ -60,7 +60,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
         setButton()
-        
+
         setFragment()
     }
 
